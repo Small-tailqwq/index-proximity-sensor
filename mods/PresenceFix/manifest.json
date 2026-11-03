@@ -1,0 +1,12 @@
+{
+  "$schema": "https://raw.githubusercontent.com/bsmg/BSIPA-MetadataFileSchema/master/Schema.json",
+  "id": "PresenceFix",
+  "name": "PresenceFix",
+  "author": "local",
+  "version": "1.1.0",
+  "description": "Replace XR_EXT_user_presence with an always-worn value or a software threshold on the raw proximity count, so songs do not stay paused when the headset's firmware threshold is not reached.",
+  "gameVersion": "1.45.3",
+  "dependsOn": {
+    "BSIPA": "^4.3.0"
+  }
+}
