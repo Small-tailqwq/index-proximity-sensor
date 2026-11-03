@@ -22,6 +22,19 @@
 - `UnityXRSystemState.IsAppFocusCurrentlyLost()` = `!_hasInputFocus || !_userPresence`。
 - `_userPresence` 在每帧 `Update()` 里通过 `SetUserPresence(OpenXRUtility.IsUserPresent)` 刷新。`SetUserPresence` 是唯一写入点，PresenceFix 就补丁在这里。
 
+### 与 1.44.1 对比（构建 `1.44.1_20239`，Steam 测试版分支 `1.44.1_legacy`）
+
+1.44.1 读取的是同一个值：`UnityXRHelper.UpdateUserPresence()` 每帧调用 `OpenXRUtility.IsUserPresent`。原生 `UnityOpenXR.dll`（Unity OpenXR 1.14.3）的逻辑也相同，只是缓存字节在 `+0x106d`，不是 `+0x1085`。区别在于游戏怎么用这个值：
+
+| | 1.44.1 | 1.45.3 |
+|---|---|---|
+| `PauseController.GetDefaultPausedState()`（开局、继续倒计时结束时） | `hasInputFocus ? !hasVrFocus : true`，**不含在场状态** | `IsAppFocusCurrentlyLost()` = `!hasInputFocus \|\| !userPresence`，**含在场状态** |
+| 在场状态的作用 | 只在“佩戴 → 未佩戴”**变化**时通过 `hmdUnmountedEvent` 调用一次 `Pause()` | 变化时同样暂停，**此外**还作为持续条件，阻止开局和每一次恢复 |
+| 一直是“未佩戴” | 没有变化，不暂停 | 无限暂停循环 |
+| 读数来回跳 | 偶尔暂停一次，可以继续 | 读到“未佩戴”期间一直暂停 |
+
+两个版本里 `_userPresence` 的初值都是 false，所以从一开始就是 false 的话不会产生变化事件。这就是为什么 1.44.1 虽然也有佩戴检测，降级仍然有效。
+
 ## 3. Unity OpenXR：值从哪来（UnityOpenXR.dll）
 
 - `OpenXRUtility.IsUserPresent` → P/Invoke `NativeConfig_GetUserPresence`。
@@ -94,5 +107,4 @@ session state -> SYNCHRONIZED / VISIBLE / FOCUSED
 
 ## 待解决
 
-- 对比 1.44.1 和 1.45.x 的 `Main.dll`，确认旧版的暂停条件里不包含在场状态。
 - 判断读数偏低是传感器老化还是佩戴问题，例如用同一工具测量其他 Index。

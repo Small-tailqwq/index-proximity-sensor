@@ -10,7 +10,7 @@ Notes and tools from tracking down why Beat Saber 1.45.x pauses on the first fra
 
 ## Short version
 
-1. **Beat Saber 1.45.x** pauses whenever OpenXR reports the user as not present (`XR_EXT_user_presence`). The check runs at song start and again when the resume countdown ends, so you get "paused on load, resume, countdown, paused again" forever. 1.44.1 does not do this.
+1. **Beat Saber 1.45.x** pauses whenever OpenXR reports the user as not present (`XR_EXT_user_presence`). The check runs at song start and again when the resume countdown ends, so you get "paused on load, resume, countdown, paused again" forever. 1.44.1 reads the same presence value, but it only pauses once at the moment it changes from worn to not worn, and it never blocks resuming. So a headset that is always reported as "not worn" causes no pauses on 1.44.1 ([details](docs/findings.md#2-beat-saber-presence-is-a-pause-condition-maindll)).
 2. **SteamVR** sends `isUserPresent = false` because the **Index HMD firmware** says the headset is not worn.
 3. **The Index's decision** comes from a raw infrared reflection count compared with a fixed threshold inside the headset firmware, around **448–450**. On the headset tested, the reading is about 140–180 with nothing in front of it and about 270–440 while worn. Normal wear often does not reach the threshold; pressing the headset closer or putting a finger on the sensor does.
 4. There is no SteamVR setting or driver parameter for the threshold. The SteamVR driver only reads `proximity.enable`, and the trigger bit arrives already computed by the headset.
@@ -30,7 +30,7 @@ Full evidence chain: [docs/findings.md](docs/findings.md).
 |---|---|---|
 | Tape over the sensor | Always "worn" for every app | No auto display-off / standby when you take the headset off |
 | Small reflective sticker inside the headset, placed so the idle reading sits just below the threshold and wearing pushes it over | Wear detection works again for every app | Fiddly; aim for roughly ≥ 500 worn and ≤ 350 off, using the overlay while adjusting |
-| Steam → Beat Saber → Properties → Betas → 1.44.1 | Old pause logic | Stuck on the old version |
+| Steam → Beat Saber → Properties → Betas → 1.44.1 | Presence only pauses on a worn → not-worn change, never blocks resuming | Stuck on the old version; a flickering sensor can still cause an occasional mid-song pause |
 | [PresenceFix](mods/PresenceFix) BSIPA plugin | Beat Saber only: presence is forced to "worn" or decided by your own threshold | Needs a modded game (BSIPA) |
 
 The real fix would be a configurable threshold, but it lives in the HMD firmware. Changing it would mean extracting and patching firmware, which this project does not attempt.
@@ -54,8 +54,8 @@ The raw count comes from SteamVR's own `lighthouse_console.exe`, using only the 
 
 ## Status
 
-- Tested on one Valve Index, Windows 11, SteamVR OpenXR runtime 2.18.4, Beat Saber 1.45.3.
-- Not verified: whether the low reading comes from sensor aging, face shape or face-gasket distance; and a direct comparison with the 1.44.1 binaries.
+- Tested on one Valve Index, Windows 11, SteamVR OpenXR runtime 2.18.4, Beat Saber 1.45.3 and 1.44.1 (static comparison of both builds).
+- Not verified: whether the low reading comes from sensor aging, face shape or face-gasket distance.
 - Reports from other headsets (Quest via WiVRn, Steam Frame) in the original Reddit thread show the same Beat Saber behavior, but their presence source is different.
 
 Original discussion: [r/beatsaber – Game starts songs paused and won't unpause](https://www.reddit.com/r/beatsaber/comments/1x6aux9/game_starts_songs_paused_and_wont_unpause/).

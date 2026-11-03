@@ -22,6 +22,19 @@ During song load the OpenXR session stays in `XR_SESSION_STATE_FOCUSED`, so this
 - `UnityXRSystemState.IsAppFocusCurrentlyLost()` = `!_hasInputFocus || !_userPresence`.
 - `_userPresence` is refreshed every frame in `Update()` → `SetUserPresence(OpenXRUtility.IsUserPresent)`. `SetUserPresence` is the only writer, so it is the patch point used by PresenceFix.
 
+### Comparison with 1.44.1 (build `1.44.1_20239`, Steam beta `1.44.1_legacy`)
+
+1.44.1 reads the same value. `UnityXRHelper.UpdateUserPresence()` calls `OpenXRUtility.IsUserPresent` every frame, and the native `UnityOpenXR.dll` (Unity OpenXR 1.14.3) has the same logic, with the cached byte at `+0x106d` instead of `+0x1085`. The difference is how the game uses the value:
+
+| | 1.44.1 | 1.45.3 |
+|---|---|---|
+| `PauseController.GetDefaultPausedState()` (song start, end of resume countdown) | `hasInputFocus ? !hasVrFocus : true`, **presence not included** | `IsAppFocusCurrentlyLost()` = `!hasInputFocus \|\| !userPresence`, **presence included** |
+| What presence does | `hmdUnmountedEvent` calls `Pause()` once, on a worn → not-worn **change** only | Same pause on change, **plus** it is a persistent condition that blocks the start and every resume |
+| Presence stuck at "not worn" | No change, so no pause | Endless pause loop |
+| Presence flickering | Occasional single pause, can be resumed | Pause loop while it reads "not worn" |
+
+`_userPresence` starts as false in both versions, so a value that is false from the start never produces a change event. That is why downgrading helps even though 1.44.1 also has wear detection.
+
 ## 3. Unity OpenXR: where the value comes from (UnityOpenXR.dll)
 
 - `OpenXRUtility.IsUserPresent` → P/Invoke `NativeConfig_GetUserPresence`.
@@ -94,5 +107,4 @@ No `isUserPresent=1` arrived during the following 60 s. Over the same period the
 
 ## Open questions
 
-- Comparing 1.44.1 and 1.45.x `Main.dll` to confirm presence was not part of the pause condition before.
 - Whether the low reading is sensor aging or fit, e.g. by measuring other Index units with the same tool.
