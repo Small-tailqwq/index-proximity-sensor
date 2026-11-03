@@ -35,6 +35,17 @@ During song load the OpenXR session stays in `XR_SESSION_STATE_FOCUSED`, so this
 
 `_userPresence` starts as false in both versions, so a value that is false from the start never produces a change event. That is why downgrading helps even though 1.44.1 also has wear detection.
 
+Confirmed in-game on 1.44.1 with the same headset and no plugin installed (BSIPA had moved PresenceFix to `Old 1.45.3 Plugins`):
+
+| Evidence | 1.44.1 | 1.45.3 |
+|---|---|---|
+| SteamVR `xrclient` log: extensions requested | `XR_EXT_user_presence, XR_KHR_D3D11_enable, …` | `XR_EXT_local_floor, XR_EXT_user_presence, …` |
+| `Player.log` at song start | `AudioTimeSyncController: state=Stopped->Playing songTime=0` | `state=Stopped->Paused songTime=0` |
+| Resume after a pause | `Paused->Playing` works | Re-pauses after every countdown |
+| Moving the headset away during a song | Keeps playing | — |
+
+So 1.44.1 receives the same "not present" value from SteamVR and simply does not use it to block playing.
+
 ## 3. Unity OpenXR: where the value comes from (UnityOpenXR.dll)
 
 - `OpenXRUtility.IsUserPresent` → P/Invoke `NativeConfig_GetUserPresence`.

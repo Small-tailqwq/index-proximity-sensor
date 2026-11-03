@@ -54,7 +54,7 @@ The raw count comes from SteamVR's own `lighthouse_console.exe`, using only the 
 
 ## Status
 
-- Tested on one Valve Index, Windows 11, SteamVR OpenXR runtime 2.18.4, Beat Saber 1.45.3 and 1.44.1 (static comparison of both builds).
+- Tested on one Valve Index, Windows 11, SteamVR OpenXR runtime 2.18.4, Beat Saber 1.45.3 and 1.44.1 (static comparison of both builds, confirmed in-game on both).
 - Not verified: whether the low reading comes from sensor aging, face shape or face-gasket distance.
 - Reports from other headsets (Quest via WiVRn, Steam Frame) in the original Reddit thread show the same Beat Saber behavior, but their presence source is different.
 

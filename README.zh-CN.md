@@ -54,7 +54,7 @@
 
 ## 现状
 
-- 测试环境：一台 Valve Index、Windows 11、SteamVR OpenXR 运行时 2.18.4、Beat Saber 1.45.3 和 1.44.1（两个版本做了静态对比）。
+- 测试环境：一台 Valve Index、Windows 11、SteamVR OpenXR 运行时 2.18.4、Beat Saber 1.45.3 和 1.44.1（两个版本都做了静态对比和实机确认）。
 - 尚未确认：读数偏低是传感器老化、脸型还是面垫距离造成的。
 - 原帖里用其他头显（Quest + WiVRn、Steam Frame）的玩家也遇到同样的 Beat Saber 现象，但他们的在场信号来源不同。
 

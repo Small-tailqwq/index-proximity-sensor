@@ -35,6 +35,17 @@
 
 两个版本里 `_userPresence` 的初值都是 false，所以从一开始就是 false 的话不会产生变化事件。这就是为什么 1.44.1 虽然也有佩戴检测，降级仍然有效。
 
+已在 1.44.1 上实机确认（同一台头显，没有装插件：BSIPA 已把 PresenceFix 挪进 `Old 1.45.3 Plugins`）：
+
+| 证据 | 1.44.1 | 1.45.3 |
+|---|---|---|
+| SteamVR `xrclient` 日志里请求的扩展 | `XR_EXT_user_presence, XR_KHR_D3D11_enable, …` | `XR_EXT_local_floor, XR_EXT_user_presence, …` |
+| 进歌时的 `Player.log` | `AudioTimeSyncController: state=Stopped->Playing songTime=0` | `state=Stopped->Paused songTime=0` |
+| 暂停后继续 | `Paused->Playing` 正常 | 每次倒计时结束都重新暂停 |
+| 打歌时把头显拿远 | 继续播放 | — |
+
+也就是说，1.44.1 从 SteamVR 收到的同样是“未佩戴”，只是不拿它来阻止游戏进行。
+
 ## 3. Unity OpenXR：值从哪来（UnityOpenXR.dll）
 
 - `OpenXRUtility.IsUserPresent` → P/Invoke `NativeConfig_GetUserPresence`。
