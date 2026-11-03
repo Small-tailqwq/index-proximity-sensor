@@ -60,4 +60,4 @@ The raw count comes from SteamVR's own `lighthouse_console.exe`, using only the 
 
 Original discussion: [r/beatsaber – Game starts songs paused and won't unpause](https://www.reddit.com/r/beatsaber/comments/1x6aux9/game_starts_songs_paused_and_wont_unpause/).
 
-Beat Saber, SteamVR and Valve Index are trademarks of their respective owners. This repository contains no game or SteamVR binaries or decompiled code.
+Code and docs are released under the [MIT License](LICENSE). Beat Saber, SteamVR and Valve Index are trademarks of their respective owners. This repository contains no game or SteamVR binaries or decompiled code.

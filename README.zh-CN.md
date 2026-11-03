@@ -60,4 +60,4 @@
 
 原帖：[r/beatsaber – Game starts songs paused and won't unpause](https://www.reddit.com/r/beatsaber/comments/1x6aux9/game_starts_songs_paused_and_wont_unpause/)。
 
-Beat Saber、SteamVR、Valve Index 是各自所有者的商标。本仓库不包含游戏或 SteamVR 的二进制文件及反编译代码。
+代码和文档以 [MIT 许可证](LICENSE) 发布。Beat Saber、SteamVR、Valve Index 是各自所有者的商标。本仓库不包含游戏或 SteamVR 的二进制文件及反编译代码。
